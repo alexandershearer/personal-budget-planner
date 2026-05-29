@@ -4,90 +4,154 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Budget" />
-<meta name="theme-color" content="#0f0f0f" />
+<meta name="theme-color" content="#f5f0e8" />
 <title>Budget Planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
   :root {
-    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
-    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
-    --text: #f0ede8; --text2: #888; --text3: #555;
-    --accent: #c8f060; --accent-dim: rgba(200,240,96,0.12);
-    --danger: #ff5e5e; --danger-dim: rgba(255,94,94,0.1);
-    --warn: #f0a840; --warn-dim: rgba(240,168,64,0.1);
-    --info: #60b8f0; --info-dim: rgba(96,184,240,0.1);
-    --radius: 14px; --radius-sm: 8px;
+    --bg: #f5f0e8;
+    --surface: #faf7f2;
+    --surface2: #ede8de;
+    --border: rgba(120,100,70,0.15);
+    --border2: rgba(120,100,70,0.25);
+    --text: #2c2416;
+    --text2: #7a6a52;
+    --text3: #a89880;
+    --accent: #8a6e3e;
+    --accent-dim: rgba(138,110,62,0.1);
+    --accent-btn: #8a6e3e;
+    --accent-btn-text: #faf7f2;
+    --danger: #b84040;
+    --danger-dim: rgba(184,64,64,0.08);
+    --warn: #c47a1a;
+    --warn-dim: rgba(196,122,26,0.1);
+    --info: #3a7ca8;
+    --info-dim: rgba(58,124,168,0.1);
+    --good: #4a7c59;
+    --radius: 14px;
+    --radius-sm: 8px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
   }
+
   html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.5; overflow: hidden; }
+
   #app { display: flex; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; }
-  .header { padding: calc(var(--safe-top) + 16px) 20px 16px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+
+  .header { padding: calc(var(--safe-top) + 16px) 20px 16px; border-bottom: 0.5px solid var(--border2); flex-shrink: 0; background: var(--surface); }
+
   .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+
   .app-title { font-family: var(--mono); font-size: 13px; color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase; }
+
   .header-actions { display: flex; gap: 8px; }
-  .icon-btn { width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--surface); border: 0.5px solid var(--border); color: var(--text2); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+  .icon-btn { width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--surface2); border: 0.5px solid var(--border2); color: var(--text2); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
   .balance-hero { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
+
   .balance-currency { font-family: var(--mono); font-size: 22px; color: var(--text2); font-weight: 400; }
+
   .balance-value { font-family: var(--mono); font-size: 44px; font-weight: 500; color: var(--text); line-height: 1; letter-spacing: -0.02em; }
+
   .balance-label { font-size: 12px; color: var(--text3); margin-bottom: 16px; font-family: var(--mono); }
+
   .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .stat-chip { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
+
+  .stat-chip { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; }
+
   .stat-chip-label { font-size: 11px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+
   .stat-chip-val { font-family: var(--mono); font-size: 18px; font-weight: 500; color: var(--text); }
+
   .stat-chip-val.danger { color: var(--danger); }
   .stat-chip-val.warn { color: var(--warn); }
-  .stat-chip-val.good { color: var(--accent); }
-  .tab-bar { display: flex; padding: 12px 20px; gap: 6px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; background: var(--bg); }
+  .stat-chip-val.good { color: var(--good); }
+
+  .tab-bar { display: flex; padding: 10px 20px; gap: 6px; border-bottom: 0.5px solid var(--border2); flex-shrink: 0; background: var(--surface); }
+
   .tab { flex: 1; text-align: center; padding: 7px 4px; border-radius: var(--radius-sm); font-size: 12px; font-family: var(--mono); cursor: pointer; border: 0.5px solid transparent; color: var(--text3); transition: all 0.15s; letter-spacing: 0.04em; }
-  .tab.active { background: var(--accent-dim); border-color: rgba(200,240,96,0.25); color: var(--accent); }
-  .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(var(--safe-bottom) + 20px); }
+
+  .tab.active { background: var(--accent-dim); border-color: rgba(138,110,62,0.25); color: var(--accent); }
+
+  .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(var(--safe-bottom) + 20px); background: var(--bg); }
+
   .view { display: none; padding-top: 16px; }
   .view.active { display: block; }
+
   .expense-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; }
+
   .exp-type-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .dot-want { background: var(--warn); }
   .dot-need { background: var(--info); }
+
   .exp-info { flex: 1; min-width: 0; }
+
   .exp-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
   .exp-meta { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-top: 1px; }
+
   .exp-right { text-align: right; flex-shrink: 0; }
+
   .exp-amt { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--danger); }
+
   .exp-after { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-top: 1px; }
   .exp-after.neg { color: var(--danger); }
+
   .del-btn { background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer; padding: 4px; flex-shrink: 0; line-height: 1; }
   .del-btn:active { color: var(--danger); }
+
   .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); font-family: var(--mono); font-size: 13px; line-height: 1.8; }
+
   .section-label { font-size: 11px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; margin-top: 20px; }
   .section-label:first-child { margin-top: 0; }
+
   .field { margin-bottom: 14px; }
+
   .field-label { font-size: 11px; color: var(--text3); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+
   input[type=text], input[type=number], select { width: 100%; background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--radius-sm); padding: 11px 14px; font-size: 15px; font-family: var(--sans); color: var(--text); outline: none; appearance: none; -webkit-appearance: none; transition: border-color 0.15s; }
-  input:focus, select:focus { border-color: rgba(200,240,96,0.4); }
+
+  input:focus, select:focus { border-color: rgba(138,110,62,0.5); }
+
   input::placeholder { color: var(--text3); }
-  select option { background: var(--surface2); color: var(--text); }
+
+  select option { background: var(--surface); color: var(--text); }
+
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
   .btn { width: 100%; padding: 13px; border-radius: var(--radius); font-size: 14px; font-family: var(--mono); font-weight: 500; cursor: pointer; border: none; letter-spacing: 0.04em; transition: all 0.15s; }
   .btn:active { transform: scale(0.98); }
-  .btn-accent { background: var(--accent); color: #0f0f0f; }
-  .btn-add { background: var(--info-dim); color: var(--info); border: 0.5px solid rgba(96,184,240,0.2); }
-  .btn-sub { background: var(--danger-dim); color: var(--danger); border: 0.5px solid rgba(255,94,94,0.2); }
+
+  .btn-accent { background: var(--accent-btn); color: var(--accent-btn-text); }
+  .btn-add { background: var(--info-dim); color: var(--info); border: 0.5px solid rgba(58,124,168,0.25); }
+  .btn-sub { background: var(--danger-dim); color: var(--danger); border: 0.5px solid rgba(184,64,64,0.2); }
+
   .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: flex-end; justify-content: center; }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,36,22,0.45); z-index: 100; align-items: flex-end; justify-content: center; }
   .modal-overlay.open { display: flex; }
+
   .modal { background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--radius) var(--radius) 0 0; padding: 20px 20px calc(var(--safe-bottom) + 20px); width: 100%; max-width: 480px; }
+
   .modal-title { font-family: var(--mono); font-size: 13px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; }
+
   .type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+
   .type-btn { padding: 9px; border-radius: var(--radius-sm); font-size: 13px; font-family: var(--mono); cursor: pointer; border: 0.5px solid var(--border2); background: var(--surface2); color: var(--text3); text-align: center; transition: all 0.15s; }
-  .type-btn.active-want { background: var(--warn-dim); border-color: rgba(240,168,64,0.3); color: var(--warn); }
-  .type-btn.active-need { background: var(--info-dim); border-color: rgba(96,184,240,0.3); color: var(--info); }
+  .type-btn.active-want { background: var(--warn-dim); border-color: rgba(196,122,26,0.3); color: var(--warn); }
+  .type-btn.active-need { background: var(--info-dim); border-color: rgba(58,124,168,0.3); color: var(--info); }
+
   .divider { height: 0.5px; background: var(--border); margin: 16px 0; }
+
   .content::-webkit-scrollbar { width: 0; }
 </style>
 </head>
@@ -117,15 +181,18 @@
       </div>
     </div>
   </div>
+
   <div class="tab-bar">
     <div class="tab active" id="tab-plan" onclick="switchTab('plan')">PLAN</div>
     <div class="tab" id="tab-add" onclick="switchTab('add')">+ ADD</div>
     <div class="tab" id="tab-summary" onclick="switchTab('summary')">SUMMARY</div>
   </div>
+
   <div class="content">
     <div class="view active" id="view-plan">
       <div id="expenseList"></div>
     </div>
+
     <div class="view" id="view-add">
       <div class="field">
         <div class="field-label">Name</div>
@@ -157,6 +224,7 @@
       </div>
       <button class="btn btn-accent" onclick="addExpense()">Add to plan</button>
     </div>
+
     <div class="view" id="view-summary">
       <div class="section-label">By type</div>
       <div id="summaryType"></div>
@@ -165,6 +233,7 @@
     </div>
   </div>
 </div>
+
 <div class="modal-overlay" id="fundsModal" onclick="closeFundsModal(event)">
   <div class="modal">
     <div class="modal-title">Update balance</div>
@@ -184,6 +253,7 @@
     </div>
   </div>
 </div>
+
 <script>
   const STORAGE_KEY = 'budget_planner_v1';
   let state = { balance: 0, expenses: [], selectedType: 'want' };
@@ -194,6 +264,7 @@
     const total = state.expenses.reduce((s,e) => s+e.amt, 0);
     const after = state.balance - total;
     document.getElementById('balDisplay').textContent = state.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('balLabel').textContent = 'current balance — tap ✎ to update';
     document.getElementById('statPlanned').textContent = fmt(total);
     const afterEl = document.getElementById('statAfter');
     afterEl.textContent = (after < 0 ? '-' : '') + fmt(after);
@@ -276,6 +347,12 @@
     if (!isNaN(v) && v > 0) { state.balance = Math.max(0, state.balance + dir * v); document.getElementById('adjustInput').value = ''; save(); render(); }
   }
   function clearAll() { if (confirm('Clear all expenses and reset balance?')) { state = { balance: 0, expenses: [], selectedType: 'want' }; save(); render(); } }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (document.getElementById('view-add').classList.contains('active')) addExpense();
+      if (document.getElementById('fundsModal').classList.contains('open')) setBalance();
+    }
+  });
   load(); render();
 </script>
 </body>
