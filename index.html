@@ -41,7 +41,7 @@
     --sans: 'DM Sans', sans-serif;
   }
 
-  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.5; overflow: hidden; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.5; overflow: hidden; }
   #app { display: flex; flex-direction: column; height: 100%; max-width: 480px; margin: 0 auto; }
 
   /* ── Nav ── */
@@ -346,6 +346,14 @@
   });
 
   load(); renderLedger();
+
+  // Prevent iOS zoom on input focus
+  document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('focus', () => {
+      document.querySelector('meta[name="viewport"]').setAttribute('content',
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+    });
+  });
 </script>
 </body>
 </html>
