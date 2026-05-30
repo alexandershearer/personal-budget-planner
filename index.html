@@ -167,7 +167,11 @@
     </div>
 
     <div class="add-panel">
-      <div class="type-toggle">
+      <div class="type-toggle" style="margin-bottom:8px;">
+        <div class="type-btn active-deposit" id="p-dirDeposit" onclick="setPlanDir('deposit')">▲ Deposit</div>
+        <div class="type-btn" id="p-dirExpense" onclick="setPlanDir('expense')">▼ Expense</div>
+      </div>
+      <div class="type-toggle" id="p-wantNeedRow">
         <div class="type-btn active-plan" id="p-typeWant" onclick="setPlanType('want')">◉ Want</div>
         <div class="type-btn" id="p-typeNeed" onclick="setPlanType('need')">◎ Need</div>
       </div>
@@ -187,6 +191,15 @@
   let state = { ledger: [], plan: [] };
   let ledgerType = 'deposit';
   let planType = 'want';
+  let planDir = 'expense';
+
+  function setPlanDir(dir) {
+    planDir = dir;
+    document.getElementById('p-dirDeposit').className = 'type-btn' + (dir === 'deposit' ? ' active-deposit' : '');
+    document.getElementById('p-dirExpense').className = 'type-btn' + (dir === 'expense' ? ' active-expense' : '');
+    // hide want/need row when it's a deposit — doesn't apply
+    document.getElementById('p-wantNeedRow').style.display = dir === 'deposit' ? 'none' : 'grid';
+  }
 
   function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
   function load() { try { const r = localStorage.getItem(KEY); if (r) state = JSON.parse(r); } catch(e) {} }
@@ -226,10 +239,12 @@
   }
 
   function addPlanEntry() {
-    const name = document.getElementById('p-name').value.trim() || (planType === 'want' ? 'Want' : 'Need');
+    const isDeposit = planDir === 'deposit';
+    const defaultName = isDeposit ? 'Deposit' : (planType === 'want' ? 'Want' : 'Need');
+    const name = document.getElementById('p-name').value.trim() || defaultName;
     const amt = parseFloat(document.getElementById('p-amt').value);
     if (isNaN(amt) || amt <= 0) { document.getElementById('p-amt').focus(); return; }
-    state.plan.unshift({ id: Date.now(), type: planType, name, amt });
+    state.plan.unshift({ id: Date.now(), dir: planDir, type: isDeposit ? 'deposit' : planType, name, amt });
     document.getElementById('p-name').value = '';
     document.getElementById('p-amt').value = '';
     save(); renderPlan();
@@ -287,15 +302,17 @@
     balEl.className = 'balance-amount ' + (real > 0 ? 'pos' : real < 0 ? 'neg' : 'zero');
     const list = document.getElementById('planList');
     list.innerHTML = '';
-    const totalPlanned = state.plan.reduce((s,e) => s+e.amt, 0);
-    const afterAll = real - totalPlanned;
+    const totalOut = state.plan.filter(e => e.dir !== 'deposit').reduce((s,e) => s+e.amt, 0);
+    const totalIn = state.plan.filter(e => e.dir === 'deposit').reduce((s,e) => s+e.amt, 0);
+    const afterAll = real - totalOut + totalIn;
     const wrap = document.getElementById('planAfterWrap');
     wrap.innerHTML = state.plan.length
       ? `<div class="plan-after ${afterAll>=0?'pos':'neg'}">after all planned: ${afterAll<0?'−':''}${fmt(afterAll)}</div>`
       : '';
     if (!state.plan.length) { list.innerHTML = '<div class="empty-state">simulate future expenses here<br>nothing here affects your real balance</div>'; return; }
-    const needs = state.plan.filter(e => e.type==='need');
-    const wants = state.plan.filter(e => e.type==='want');
+    const deposits = state.plan.filter(e => e.dir === 'deposit');
+    const needs = state.plan.filter(e => e.dir !== 'deposit' && e.type === 'need');
+    const wants = state.plan.filter(e => e.dir !== 'deposit' && e.type === 'want');
     let running = real;
     function renderGroup(items, label) {
       if (!items.length) return;
@@ -303,17 +320,18 @@
       const lbl = document.createElement('div'); lbl.className = 'day-label'; lbl.textContent = '⬡ ' + label;
       g.appendChild(lbl);
       items.forEach(e => {
-        running -= e.amt;
+        const isDeposit = e.dir === 'deposit';
+        running += isDeposit ? e.amt : -e.amt;
         const isNeg = running < 0;
         const div = document.createElement('div'); div.className = 'entry planned';
         div.innerHTML = `
-          <div class="entry-icon icon-plan">◎</div>
+          <div class="entry-icon ${isDeposit ? 'icon-deposit' : 'icon-plan'}">${isDeposit ? '▲' : '◎'}</div>
           <div class="entry-info">
             <div class="entry-name">${e.name}</div>
-            <div class="entry-meta">${e.type}</div>
+            <div class="entry-meta">${isDeposit ? 'deposit' : e.type}</div>
           </div>
           <div class="entry-right">
-            <div class="entry-amt amt-plan">−${fmt(e.amt)}</div>
+            <div class="entry-amt ${isDeposit ? 'amt-deposit' : 'amt-plan'}">${isDeposit ? '+' : '−'}${fmt(e.amt)}</div>
             <div class="entry-bal ${isNeg ? 'neg' : ''}">→ ${isNeg?'−':''}${fmt(running)}</div>
           </div>
           <button class="del-btn" onclick="removePlanEntry(${e.id})">×</button>`;
@@ -321,6 +339,7 @@
       });
       list.appendChild(g);
     }
+    renderGroup(deposits, 'Deposits');
     renderGroup(needs, 'Needs');
     renderGroup(wants, 'Wants');
   }
